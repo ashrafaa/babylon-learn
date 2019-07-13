@@ -8,42 +8,64 @@ window.addEventListener("DOMContentLoaded", function() {
     // Create a basic BJS Scene object.
     let scene = new BABYLON.Scene(engine);
 
-    // Create a FreeCamera, and set its position to (x:0, y:5, z:-10).
-    let camera = new BABYLON.FreeCamera(
-      "camera",
-      new BABYLON.Vector3(0, 5, -10),
+    // Add a camera to the scene and attach it to the canvas
+    let camera = new BABYLON.ArcRotateCamera(
+      "Camera",
+      Math.PI / 2,
+      Math.PI / 2,
+      2,
+      new BABYLON.Vector3(0, 1, 5),
       scene
     );
+    camera.attachControl(canvas, true);
 
-    // Target the camera to scene origin.
-    camera.setTarget(BABYLON.Vector3.Zero());
-
-    // Attach the camera to the canvas.
-    camera.attachControl(canvas, false);
-
-    // Create a basic light, aiming 0,1,0 - meaning, to the sky.
-    let light = new BABYLON.HemisphericLight(
+    // Add lights to the scene
+    let light1 = new BABYLON.HemisphericLight(
       "light1",
-      new BABYLON.Vector3(0, 1, 0),
+      new BABYLON.Vector3(1, 1, 0),
+      scene
+    );
+    let light2 = new BABYLON.PointLight(
+      "light2",
+      new BABYLON.Vector3(0, 1, -1),
       scene
     );
 
-    // Create a built-in "sphere" shape.
+    let ground = BABYLON.MeshBuilder.CreateGround(
+      "ground",
+      { width: 2, height: 3 },
+      scene
+    );
+
+    let myBox = BABYLON.MeshBuilder.CreateBox(
+      "myBox",
+      { height: 1, width: 2, depth: 0.5 },
+      scene
+    );
+    myBox.position = new BABYLON.Vector3(1, 1, -2);
+    myBox.rotation = new BABYLON.Vector3(0, 45, 90);
+
+    // Add and manipulate meshes in the scene
     let sphere = BABYLON.MeshBuilder.CreateSphere(
       "sphere",
-      { segments: 16, diameter: 2 },
+      { diameter: 2 },
       scene
     );
+    sphere.position = new BABYLON.Vector3(2, 1, 1);
 
-    // Move the sphere upward 1/2 of its height.
-    sphere.position.y = 1;
+    // Add line
+    let myPoints = [
+      new BABYLON.Vector3(0, 0, 0),
+      new BABYLON.Vector3(0, 1, 1),
+      new BABYLON.Vector3(0, 1, 0)
+    ];
 
-    // Create a built-in "ground" shape.
-    let ground = BABYLON.MeshBuilder.CreateGround(
-      "ground1",
-      { height: 6, width: 6, subdivisions: 2 },
-      scene
-    );
+    BABYLON.MeshBuilder.CreateLines("lines", { points: myPoints }, scene);
+
+    let myMaterial = new BABYLON.StandardMaterial("myMaterial", scene);
+    myMaterial.emissiveColor = new BABYLON.Color3(0, 0, 1);
+
+    myBox.material = myMaterial;
 
     // Return the created scene.
     return scene;
